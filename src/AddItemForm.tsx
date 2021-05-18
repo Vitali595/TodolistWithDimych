@@ -11,25 +11,28 @@ export const AddItemForm = React.memo((props: AddItemFormPropsType) => {
     const [newTaskTitle, setNewTaskTitle] = useState("");
     const [error, setError] = useState<string | null>(null);
     const onNewTitleChangeHandler = (e: ChangeEvent<HTMLInputElement>) => {
-        setNewTaskTitle(e.currentTarget.value)
-    }
-    const onKeyPressHandler = (e: KeyboardEvent<HTMLInputElement>) => {
         if (error !== null) {
             setError(null)
         }
-        if (e.key === "Enter") {
-            props.addItem(newTaskTitle)
-            setNewTaskTitle("")
-        }
+        setNewTaskTitle(e.currentTarget.value)
     }
+
     const addItem = () => {
-        if (newTaskTitle.trim() !== "") {
-            props.addItem(newTaskTitle.trim())
-            setNewTaskTitle("")
+        const trimmedTitle = newTaskTitle.trim()
+        if (trimmedTitle) {
+            props.addItem(trimmedTitle)
         } else {
             setError("Title is required")
         }
+        setNewTaskTitle("")
     }
+
+    const onKeyPressHandler = (e: KeyboardEvent<HTMLInputElement>) => {
+        if (e.key === "Enter") {
+            addItem()
+        }
+    }
+
     return (
         <div>
             <TextField value={newTaskTitle}
