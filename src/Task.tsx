@@ -1,10 +1,10 @@
 import {useDispatch} from "react-redux";
-import {changeTaskStatusAC, changeTaskTitleAC, removeTaskAC} from "./state/tasks-reducer";
+import {removeTaskTC, updateTaskTC} from "./state/tasks-reducer";
 import React, {ChangeEvent, useCallback} from "react";
 import {Checkbox, IconButton} from "@material-ui/core";
 import {EditableSpan} from "./EditableSpan";
 import {Delete} from "@material-ui/icons";
-import {TaskType} from "./Todolist";
+import {TaskStatuses, TaskType} from "./api/todolists-api";
 
 export type TaskPropsType = {
     task: TaskType
@@ -15,19 +15,19 @@ export const Task = React.memo((props: TaskPropsType) => {
     const dispatch = useDispatch()
 
     const onRemoveHandler = () => {
-        dispatch(removeTaskAC(props.task.id, props.todolistId))
+        dispatch(removeTaskTC(props.task.id, props.todolistId))
     }
-    const onChangeStatusHandler = (e: ChangeEvent<HTMLInputElement>) => {
+    const onChangeStatusHandler = useCallback((e: ChangeEvent<HTMLInputElement>) => {
         let newIsDoneValue = e.currentTarget.checked
-        dispatch(changeTaskStatusAC(props.task.id, newIsDoneValue, props.todolistId))
-    }
+        dispatch(updateTaskTC(props.task.id, {status: newIsDoneValue ? TaskStatuses.Completed : TaskStatuses.New}, props.todolistId))
+    }, [dispatch])
     const onChangeTitleHandler = useCallback((newValue: string) => {
-        dispatch(changeTaskTitleAC(props.task.id, newValue, props.todolistId))
+        dispatch(updateTaskTC(props.task.id, {title: newValue}, props.todolistId))
     }, [dispatch])
 
-    return <div className={props.task.isDone ? "is-done" : ""} key={props.task.id}>
+    return <div className={props.task.status === TaskStatuses.Completed ? "is-done" : ""} key={props.task.id}>
         <Checkbox
-            checked={props.task.isDone}
+            checked={props.task.status === TaskStatuses.Completed}
             onChange={onChangeStatusHandler}
         />
         <EditableSpan title={props.task.title} onChange={onChangeTitleHandler}/>

@@ -1,19 +1,14 @@
-import React, {useCallback} from "react";
-import {FilterValuesType} from "./AppWithRedux";
+import React, {useCallback, useEffect} from "react";
 import {AddItemForm} from "./AddItemForm";
 import {EditableSpan} from "./EditableSpan";
 import {Button, IconButton} from "@material-ui/core";
 import {Delete} from "@material-ui/icons";
 import {useDispatch, useSelector} from "react-redux";
-import {AppRootState} from "./state/store";
-import {addTaskAC} from "./state/tasks-reducer";
+import {AppRootStateType} from "./state/store";
+import {addTaskAC, addTaskTC, fetchTasksTC} from "./state/tasks-reducer";
 import {Task} from "./Task";
-
-export type TaskType = {
-    id: string
-    title: string
-    isDone: boolean
-}
+import {FilterValuesType} from "./state/todolists-reducer";
+import {TaskStatuses, TaskType} from "./api/todolists-api";
 
 type PropsType = {
     id: string
@@ -26,7 +21,11 @@ type PropsType = {
 
 export const Todolist = React.memo((props: PropsType) => {
     console.log("Todolist is called")
-    const tasks = useSelector<AppRootState, Array<TaskType>>(state => state.tasks[props.id])
+
+    useEffect(() => {
+        dispatch(fetchTasksTC(props.id))
+    }, [])
+    const tasks = useSelector<AppRootStateType, Array<TaskType>>(state => state.tasks[props.id])
     const dispatch = useDispatch()
 
     const onAllClickHandler = useCallback(() => props.changeFilter("all", props.id), [props.changeFilter, props.id])
@@ -38,7 +37,7 @@ export const Todolist = React.memo((props: PropsType) => {
     }, [props.removeTodolist, props.id])
 
     const addTask = useCallback((title: string) => {
-        dispatch(addTaskAC(title, props.id))
+        dispatch(addTaskTC(props.id, title))
     }, [dispatch])
 
     const changeTodolistTitle = useCallback((newTitle: string) => {
@@ -48,10 +47,10 @@ export const Todolist = React.memo((props: PropsType) => {
     let tasksForTodolist = tasks
 
     if (props.filter === "completed") {
-        tasksForTodolist = tasksForTodolist.filter(t => t.isDone === true);
+        tasksForTodolist = tasksForTodolist.filter(t => t.status === TaskStatuses.Completed);
     }
     if (props.filter === "active") {
-        tasksForTodolist = tasksForTodolist.filter(t => t.isDone === false);
+        tasksForTodolist = tasksForTodolist.filter(t => t.status === TaskStatuses.New);
     }
 
     return (
