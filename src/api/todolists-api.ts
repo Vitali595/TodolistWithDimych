@@ -15,7 +15,7 @@ export type TodolistType = {
     title: string
 }
 
-type ResponseType<D = {}> = {
+export type ResponseType<D = {}> = {
     resultCode: number
     messages: Array<string>
     data: D
@@ -87,6 +87,6 @@ export const todolistsAPI = {
         return instance.post<ResponseType<{ item: TaskType }>>(`todo-lists/${todolistId}/tasks`, {title: title})
     },
     updateTask(todolistId: string, taskId: string, model: UpdateTaskType) {
-        return instance.put<UpdateTaskType>(`https://social-network.samuraijs.com/api/1.1//todo-lists/${todolistId}/tasks/${taskId}`, model)
+        return instance.put<ResponseType<TaskType>>(`https://social-network.samuraijs.com/api/1.1//todo-lists/${todolistId}/tasks/${taskId}`, model)
     }
 }

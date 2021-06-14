@@ -1,42 +1,62 @@
 import React, {useCallback, useEffect} from 'react';
 import './App.css';
-import {Todolist} from "./Todolist";
-import {AddItemForm} from "./AddItemForm";
-import {AppBar, Button, Container, Grid, IconButton, Paper, Toolbar, Typography} from "@material-ui/core";
+import {Todolist} from "../features/TodolistsList/Todolist/Todolist";
+import {AddItemForm} from "../components/AddItemForm/AddItemForm";
+import {
+    AppBar,
+    Button,
+    Container,
+    Grid,
+    IconButton,
+    LinearProgress,
+    Paper,
+    Toolbar,
+    Typography
+} from "@material-ui/core";
 import {Menu} from "@material-ui/icons";
 import {
-    addTodolistAC, addTodolistsTC,
+    addTodolistTC,
     changeTodolistFilterAC,
-    changeTodolistTitleAC, changeTodolistTitleTC,
+    changeTodolistTitleTC,
     fetchTodolistsTC,
     FilterValuesType,
-    removeTodolistAC, removeTodolistsTC,
+    removeTodolistTC,
     TodolistDomainType
-} from "./state/todolists-reducer";
+} from "../features/TodolistsList/Todolist/todolists-reducer";
 import {useDispatch, useSelector} from "react-redux";
-import {AppRootStateType} from "./state/store";
-import {TaskType, todolistsAPI} from "./api/todolists-api";
+import {AppRootStateType} from "./store";
+import {TaskType} from "../api/todolists-api";
+import {ErrorSnackbar} from "../components/ErrorSnackbar/ErrorSnackbar";
+import {RequestStatusType} from "./app-reducer";
 
 export type TasksStateType = {
     [key: string]: Array<TaskType>
 }
 
-function AppWithRedux() {
+type AppPropsType = {
+    demo?: boolean
+}
+
+function App({demo = false}: AppPropsType) {
 
     useEffect(() => {
+        if (demo) {
+            return
+        }
         dispatch(fetchTodolistsTC())
     }, [])
 
     const todolists = useSelector<AppRootStateType, Array<TodolistDomainType>>(state => state.todolists)
+    const status = useSelector<AppRootStateType, RequestStatusType>(state => state.app.status)
 
     const dispatch = useDispatch()
 
     const removeTodolist = useCallback((todolistId: string) => {
-        dispatch(removeTodolistsTC(todolistId))
+        dispatch(removeTodolistTC(todolistId))
     }, [dispatch])
 
     const addTodolist = useCallback((title: string) => {
-        dispatch(addTodolistsTC(title))
+        dispatch(addTodolistTC(title))
     }, [dispatch])
 
     const changeTodolistFilter = useCallback((value: FilterValuesType, todolistId: string) => {
@@ -49,6 +69,7 @@ function AppWithRedux() {
 
     return (
         <div className="App">
+            <ErrorSnackbar/>
             <AppBar position={"static"}>
                 <Toolbar>
                     <IconButton edge={"start"} color={"inherit"} aria-label={"menu"}>
@@ -59,6 +80,7 @@ function AppWithRedux() {
                     </Typography>
                     <Button color={"inherit"}>Login</Button>
                 </Toolbar>
+                {status === "loading" && <LinearProgress/>}
             </AppBar>
             <Container fixed>
                 <Grid container style={{padding: "20px"}}>
@@ -71,13 +93,12 @@ function AppWithRedux() {
                             return <Grid key={tl.id} item>
                                 <Paper elevation={6} style={{padding: "20px"}}>
                                     <Todolist
+                                        todolist={tl}
                                         key={tl.id}
-                                        id={tl.id}
-                                        title={tl.title}
                                         changeTodolistTitle={changeTodolistTitle}
                                         changeFilter={changeTodolistFilter}
                                         removeTodolist={removeTodolist}
-                                        filter={tl.filter}
+                                        demo={demo}
                                     />
                                 </Paper>
                             </Grid>
@@ -91,4 +112,4 @@ function AppWithRedux() {
     );
 }
 
-export default AppWithRedux;
+export default App;
