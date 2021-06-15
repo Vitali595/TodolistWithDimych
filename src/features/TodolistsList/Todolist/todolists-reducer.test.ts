@@ -4,7 +4,7 @@ import {
     changeTodolistFilterAC,
     removeTodolistAC,
     todolistsReducer, TodolistDomainType, FilterValuesType, setTodolistsAC, changeTodolistEntityStatusAC
-} from "./todolists-reducer";
+} from "../todolists-reducer";
 import {v1} from "uuid";
 import {TodolistType} from "../../../api/todolists-api";
 import {RequestStatusType} from "../../../app/app-reducer";

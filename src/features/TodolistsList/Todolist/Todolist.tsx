@@ -7,7 +7,7 @@ import {useDispatch, useSelector} from "react-redux";
 import {AppRootStateType} from "../../../app/store";
 import {addTaskTC, fetchTasksTC} from "./tasks-reducer";
 import {Task} from "./Task/Task";
-import {FilterValuesType, TodolistDomainType} from "./todolists-reducer";
+import {FilterValuesType, TodolistDomainType} from "../todolists-reducer";
 import {TaskStatuses, TaskType} from "../../../api/todolists-api";
 
 type PropsType = {
