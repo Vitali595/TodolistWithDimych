@@ -13,21 +13,23 @@ import {AppRootStateType} from "../../app/store";
 import {Grid, Paper} from "@material-ui/core";
 import {AddItemForm} from "../../components/AddItemForm/AddItemForm";
 import {Todolist} from "./Todolist/Todolist";
+import {Redirect} from "react-router-dom";
 
 type TodolistListPropsType = {
     demo?: boolean
 }
 export const TodolistsList: React.FC<TodolistListPropsType> = ({demo = false}) => {
 
+    const todolists = useSelector<AppRootStateType, Array<TodolistDomainType>>(state => state.todolists)
+    const isLoggedIn = useSelector<AppRootStateType, boolean>(state => state.auth.isLoggedIn)
+    const dispatch = useDispatch()
+
     useEffect(() => {
-        if (demo) {
+        if (demo || !isLoggedIn) {
             return
         }
         dispatch(fetchTodolistsTC())
     }, [])
-
-    const todolists = useSelector<AppRootStateType, Array<TodolistDomainType>>(state => state.todolists)
-    const dispatch = useDispatch()
 
     const removeTodolist = useCallback((todolistId: string) => {
         dispatch(removeTodolistTC(todolistId))
@@ -44,6 +46,10 @@ export const TodolistsList: React.FC<TodolistListPropsType> = ({demo = false}) =
     const changeTodolistTitle = useCallback((id: string, newTitle: string) => {
         dispatch(changeTodolistTitleTC(id, newTitle))
     }, [dispatch])
+
+    if (!isLoggedIn) {
+        return <Redirect to={"/login"}/>
+    }
 
     return <>
         <Grid container style={{padding: "20px"}}>

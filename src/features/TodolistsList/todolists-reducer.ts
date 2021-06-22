@@ -7,6 +7,7 @@ import {
     setAppStatusAC,
     SetAppStatusActionType
 } from "../../app/app-reducer";
+import {handleServerNetworkError} from "../../utils/error-utils";
 
 const initialState: Array<TodolistDomainType> = []
 
@@ -48,6 +49,9 @@ export const fetchTodolistsTC = () => (dispatch: ThunkDispatch) => {
         .then((res) => {
             dispatch(setTodolistsAC(res.data))
             dispatch(setAppStatusAC("succeeded"))
+        })
+        .catch(error => {
+            handleServerNetworkError(error, dispatch)
         })
 }
 
